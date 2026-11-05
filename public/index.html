@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://copilot-cn.bytedance.net https://lf-cdn.trae.com.cn; media-src 'self' blob: https:; connect-src 'self' ws: wss: https: http://127.0.0.1:7777;"
+  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#08090d">
+  <meta name="description" content="Forever, a private always-on AI radio station.">
+  <title>Forever - Private AI Radio</title>
+  <link id="app-favicon" rel="icon" href="/assets/forever-icon-192.png">
+  <link id="app-touch-icon" rel="apple-touch-icon" href="/assets/forever-icon-512.png">
+  <link rel="stylesheet" href="/fonts/fonts.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/album.css">
+  <link rel="stylesheet" href="/glass.css">
+  <link rel="stylesheet" href="/guide.css">
+  <script defer src="/vendor/lucide-0.468.0.min.js"></script>
+</head>
+<body>
+  <div class="album-backdrop" aria-hidden="true"><div id="album-glow"></div></div>
+  <div class="app">
+    <header class="masthead">
+      <div class="wordmark">
+        <button class="profile-avatar-button" id="profile-button" type="button" aria-label="查看 Forever 档案">
+          <img
+            data-claudio-avatar
+            src="/api/avatar"
+            alt="Forever"
+          >
+          <i></i>
+        </button>
+        <span data-claudio-name>Forever</span>
+      </div>
+
+      <div class="masthead-actions">
+        <button class="guide-launch" type="button" data-start-guide aria-label="重新查看电台使用指南">
+          <span class="guide-launch-mark" aria-hidden="true">?</span><span class="guide-launch-text">使用指南</span>
+        </button>
+        <a class="lab-button" href="/debug.html">LAB</a>
+        <div class="theme-switch" role="group" aria-label="颜色主题">
+          <button type="button" data-theme-value="dark">DARK</button>
+          <button type="button" data-theme-value="light">LIGHT</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="album-stage" aria-label="唱片播放舞台" hidden>
+        <p class="album-eyebrow">YOUR PRIVATE LISTENING ROOM</p>
+        <div class="album-deck" id="album-deck" aria-label="唱片队列"></div>
+        <div class="album-navigation">
+          <button id="album-previous" type="button" aria-label="上一张唱片">←</button>
+          <span id="album-position" aria-live="polite"></span>
+          <button id="album-next" type="button" aria-label="下一张唱片">→</button>
+        </div>
+      </section>
+      <section class="clock-stage" aria-label="直播舞台">
+        <div class="stage-switch" role="group" aria-label="舞台显示模式">
+          <button class="active" type="button" data-stage-mode="time" title="显示时间" aria-label="显示时间" aria-pressed="true">
+            <i data-lucide="clock-3"></i>
+          </button>
+          <button type="button" data-stage-mode="lyrics" title="显示歌词" aria-label="显示歌词" aria-pressed="false">
+            <i data-lucide="list-music"></i>
+          </button>
+          <button type="button" data-stage-mode="comments" title="显示评论" aria-label="显示评论" aria-pressed="false">
+            <i data-lucide="message-circle"></i>
+          </button>
+        </div>
+
+        <div class="stage-view time-view" id="time-view">
+          <time class="hero-clock" id="hero-clock">--:--</time>
+          <p id="weekday">Monday</p>
+          <p class="full-date" id="full-date">20 APR 2026</p>
+        </div>
+
+        <div class="stage-view lyrics-view" id="lyrics-view" hidden>
+          <header class="stage-view-head">
+            <span>NOW SINGING</span>
+            <strong id="lyrics-track">IF / BREAD</strong>
+          </header>
+          <div class="lyrics-scroll" id="lyrics-scroll" aria-live="polite">
+            <p class="stage-empty">歌词准备中...</p>
+          </div>
+        </div>
+
+        <div class="stage-view comments-view" id="comments-view" hidden>
+          <header class="stage-view-head">
+            <span>LISTENER NOTES</span>
+            <strong id="comments-count">-- COMMENTS</strong>
+          </header>
+          <div class="comments-scroll" id="comments-scroll" aria-live="polite">
+            <p class="stage-empty">评论准备中...</p>
+          </div>
+        </div>
+
+        <p class="on-air" id="connection-status" aria-live="polite">
+          <span id="connection-indicator"></span>
+          <b id="connection-copy">CONNECTING</b>
+        </p>
+      </section>
+
+      <section class="player" id="player">
+        <div class="player-main">
+          <div class="track-identity">
+            <img id="player-cover" class="player-cover" alt="" hidden>
+            <div class="level-meter" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <div class="track-copy">
+              <strong id="track-title">If</strong>
+              <span id="track-artist">Bread · PLAYING</span>
+            </div>
+          </div>
+
+          <div class="transport" aria-label="播放控制">
+            <button class="circle-button" id="previous-button" type="button" title="上一首" aria-label="上一首">
+              <i data-lucide="skip-back"></i>
+            </button>
+            <button class="circle-button" id="play-button" type="button" title="播放" aria-label="播放">
+              <i data-lucide="play"></i>
+            </button>
+            <button class="circle-button" id="next-button" type="button" title="下一首" aria-label="下一首">
+              <i data-lucide="skip-forward"></i>
+            </button>
+            <button class="circle-button" id="stop-button" type="button" title="停止" aria-label="停止">
+              <i data-lucide="square"></i>
+            </button>
+            <button class="circle-button" id="favorite-button" type="button" title="收藏" aria-label="收藏">
+              <i data-lucide="heart"></i>
+            </button>
+          </div>
+
+          <div class="player-options">
+            <button id="hide-button" type="button">HIDE</button>
+            <button id="fav-filter-button" type="button">FAV</button>
+            <button class="icon-option active" id="pin-player-button" type="button" title="取消播放器吸顶" aria-label="取消播放器吸顶" aria-pressed="true">
+              <i data-lucide="pin"></i>
+            </button>
+            <label class="volume-control">
+              <span>VOL</span>
+              <i data-lucide="volume-2"></i>
+              <input id="volume" type="range" min="0" max="100" value="68" aria-label="音量">
+            </label>
+          </div>
+        </div>
+
+        <div class="progress-row">
+          <span id="elapsed">0:00</span>
+          <input id="progress" type="range" min="0" max="158" value="0" aria-label="播放进度">
+          <span id="duration">2:38</span>
+        </div>
+        <audio id="audio" preload="none"></audio>
+      </section>
+
+      <section class="album-lyrics" id="album-lyrics" aria-label="当前歌词" hidden></section>
+
+      <section class="queue" aria-label="播放队列">
+        <header class="section-bar">
+          <span>QUEUE</span>
+          <span id="queue-count">0 TRACKS</span>
+        </header>
+        <div class="queue-list" id="queue-list"></div>
+      </section>
+
+      <section class="conversation" id="conversation" aria-label="与 Forever 的对话">
+        <header class="conversation-toolbar">
+          <span id="response-mode-indicator" aria-live="polite">LIVE CHAT · DIRECT</span>
+          <button id="chat-focus-button" type="button" title="全屏聊天" aria-label="全屏聊天" aria-pressed="false">
+            <i data-lucide="maximize-2"></i>
+          </button>
+        </header>
+        <article class="message assistant">
+          <div class="message-avatar">
+            <img
+              data-claudio-avatar
+              src="/api/avatar"
+              alt=""
+            >
+          </div>
+          <div class="message-body">
+            <span class="message-author" data-claudio-name>FOREVER</span>
+            <div class="message-bubble" id="welcome-message">
+              正在读取此刻的节目状态...
+            </div>
+            <div class="message-meta">
+              <time id="welcome-time">--:--</time>
+              <button class="replay-button" type="button" data-replay>▶ REPLAY</button>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <form class="composer" id="composer">
+      <label class="sr-only" for="message-input">对 Forever 说</label>
+      <input id="message-input" maxlength="500" autocomplete="off" placeholder="Say something to the DJ...">
+      <button class="composer-button" id="mic-button" type="button" title="语音输入" aria-label="语音输入">
+        <i data-lucide="mic"></i>
+      </button>
+      <button class="composer-button send" id="send-button" type="submit" title="发送" aria-label="发送">
+        <i data-lucide="arrow-up"></i>
+      </button>
+    </form>
+  </div>
+
+  <dialog class="profile-dialog" id="profile-dialog">
+    <article class="profile-sheet">
+      <header class="profile-sheet-head">
+        <span id="profile-record-title">LOCAL DJ PROFILE / FOREVER-01</span>
+        <form method="dialog">
+          <button class="circle-button" value="cancel" aria-label="关闭"><i data-lucide="x"></i></button>
+        </form>
+      </header>
+
+      <section class="profile-identity">
+        <div class="profile-avatar-large">
+          <img
+            data-claudio-avatar
+            src="/api/avatar"
+            alt="Forever"
+          >
+          <i></i>
+        </div>
+        <div>
+          <p>PRIVATE AI DJ</p>
+          <h2 data-claudio-name>Forever</h2>
+          <strong>一开机，我就打碟</strong>
+        </div>
+      </section>
+
+      <section class="profile-manifesto">
+        <p>你的私人 DJ，会读懂 <code>taste.md</code>，也会记住每一次跳过和收藏。</p>
+        <p>Your mood is my prompt.</p>
+        <p>I hate algorithm. I have taste.</p>
+      </section>
+
+      <dl class="profile-stats">
+        <div><dt>ON AIR</dt><dd>24/7</dd></div>
+        <div><dt>GENRES</dt><dd>∞</dd></div>
+        <div><dt>LISTENER</dt><dd>1</dd></div>
+      </dl>
+
+      <section class="profile-genres">
+        <p>YOUR SOUND DNA</p>
+        <div id="profile-tags">
+          <span>JAZZ</span><span>HIP-HOP</span><span>NEO-CLASSICAL</span>
+          <span>90S 华语</span><span>J-ROCK</span><span>下雨白噪音</span>
+          <span>POST-PUNK</span><span>SHIBUYA-KEI</span>
+        </div>
+      </section>
+
+      <section class="profile-memory">
+        <header><span>LOCAL MEMORY</span><a href="/debug.html">EDIT IN LAB →</a></header>
+        <div id="taste-content">正在读取本地品味语料...</div>
+        <p>这些内容只保存在当前设备的 <code>user/</code> 目录中。</p>
+      </section>
+    </article>
+  </dialog>
+
+  <script src="/album.js"></script>
+  <script src="/guide.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

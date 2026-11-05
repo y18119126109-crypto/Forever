@@ -1,0 +1,40 @@
+# Local credentials and personal application data
+.env
+.env.*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+/state.db*
+user/
+cache/
+public/uploads/
+*.pem
+*.key
+*.p12
+*.pfx
+*.mobileprovision
+
+# Dependencies and packaged applications
+node_modules/
+.release/
+dist-desktop/
+*.app/
+*.dmg
+*.exe
+*.zip
+
+# Local checks, drafts and operating-system metadata
+.checks/
+.dbg/
+.backups/
+draft_*_folder/
+debug-*.md
+/spec.md
+/根据施工图实现页面.md
+.DS_Store
+*.log
+
+# Superseded artwork, unused by current builds
+build/icon-source.jpg

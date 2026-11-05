@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://copilot-cn.bytedance.net https://lf-cdn.trae.com.cn; media-src 'self' blob: https:; connect-src 'self' ws: wss: https:;"
+  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08090d">
+  <title>Forever Lab - 调试设置</title>
+  <link id="app-favicon" rel="icon" href="/assets/forever-icon-192.png">
+  <link id="app-touch-icon" rel="apple-touch-icon" href="/assets/forever-icon-512.png">
+  <link rel="stylesheet" href="/fonts/fonts.css">
+  <link rel="stylesheet" href="/debug.css">
+  <link rel="stylesheet" href="/guide.css">
+  <script defer src="/vendor/lucide-0.468.0.min.js"></script>
+</head>
+<body>
+  <div class="debug-shell">
+    <header class="debug-nav">
+      <a class="back-link" href="/">
+        <i data-lucide="arrow-left"></i>
+        <span>RADIO</span>
+      </a>
+      <div class="lab-title"><span id="lab-assistant-name">Forever</span><b>LAB</b></div>
+      <div class="lab-nav-actions">
+        <button class="guide-launch" type="button" data-start-guide aria-label="重新查看 Lab 使用指南">
+          <span class="guide-launch-mark" aria-hidden="true">?</span><span class="guide-launch-text">使用指南</span>
+        </button>
+        <div class="service-state" id="service-state"><span></span> CHECKING</div>
+      </div>
+    </header>
+
+    <nav class="settings-tabs" role="tablist" aria-label="Lab 设置分页">
+      <button type="button" role="tab" data-settings-page="identity" aria-controls="panel-identity">
+        身份
+      </button>
+      <button type="button" role="tab" data-settings-page="profile" aria-controls="panel-profile">
+        记忆
+      </button>
+      <button type="button" role="tab" data-settings-page="recommendation" aria-controls="panel-recommendation">
+        推荐
+      </button>
+      <button type="button" role="tab" data-settings-page="integrations" aria-controls="panel-integrations">
+        服务
+      </button>
+      <button type="button" role="tab" data-settings-page="voice" aria-controls="panel-voice">
+        声音
+      </button>
+      <button type="button" role="tab" data-settings-page="appearance" aria-controls="panel-appearance">
+        外观
+      </button>
+    </nav>
+
+    <main>
+      <header class="page-title">
+        <p>LOCAL CONTROL SURFACE / 01</p>
+        <h1>控制台</h1>
+        <span>各分页独立保存，提交后同步至主电台。</span>
+      </header>
+
+      <form id="settings-form">
+        <section
+          class="avatar-section"
+          id="panel-identity"
+          role="tabpanel"
+          data-settings-panel="identity"
+        >
+          <header class="section-heading">
+            <span>01</span>
+            <div><p>IDENTITY</p><h2 id="identity-heading">Forever 的头像</h2></div>
+          </header>
+
+          <div class="avatar-editor">
+            <div class="avatar-preview-wrap">
+              <img
+                id="avatar-preview"
+                src="/api/avatar"
+                alt="Forever 当前头像"
+              >
+              <span>ON AIR</span>
+            </div>
+            <div class="avatar-actions">
+              <label class="identity-name-field">
+                <span>助理名称</span>
+                <input id="assistant-name" maxlength="32" autocomplete="off">
+              </label>
+              <p>JPEG、PNG 或 WebP，最大 3MB。</p>
+              <input class="sr-only" id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp">
+              <div class="button-row">
+                <label class="button primary" for="avatar-file"><i data-lucide="upload"></i>上传头像</label>
+                <button class="button" id="reset-avatar" type="button"><i data-lucide="rotate-ccw"></i>恢复默认</button>
+              </div>
+              <p class="field-status" id="avatar-status" aria-live="polite"></p>
+            </div>
+          </div>
+          <footer class="section-footer">
+            <p class="section-status" id="identity-status" aria-live="polite">已同步</p>
+            <button class="button primary" type="button" data-save-section="identity">
+              <i data-lucide="save"></i>保存并同步
+            </button>
+          </footer>
+        </section>
+
+        <section
+          class="profile-section"
+          id="panel-profile"
+          role="tabpanel"
+          data-settings-panel="profile"
+          hidden
+        >
+          <header class="section-heading">
+            <span>02</span>
+            <div><p>MEMORY & TASTE</p><h2>声音基因与记忆</h2></div>
+          </header>
+
+          <div class="profile-fields">
+            <label>
+              <span>YOUR SOUND DNA</span>
+              <input id="genre-tags" maxlength="520" autocomplete="off">
+            </label>
+            <div class="genre-preview" id="genre-preview" aria-label="声音基因预览"></div>
+            <label>
+              <span>LOCAL MEMORY / TASTE.MD</span>
+              <textarea id="taste-markdown" rows="9" maxlength="8000" spellcheck="false"></textarea>
+            </label>
+          </div>
+          <footer class="section-footer">
+            <p class="section-status" id="profile-status" aria-live="polite">已同步</p>
+            <button class="button primary" type="button" data-save-section="profile">
+              <i data-lucide="save"></i>保存并同步
+            </button>
+          </footer>
+        </section>
+
+        <section
+          class="recommendation-section"
+          id="panel-recommendation"
+          role="tabpanel"
+          data-settings-panel="recommendation"
+          hidden
+        >
+          <header class="section-heading">
+            <span>03</span>
+            <div><p>AUTOPLAY MIX</p><h2>自动推荐比例</h2></div>
+          </header>
+
+          <div class="recommendation-controls">
+            <div class="strategy-summary">
+              <span>CURRENT STRATEGY</span>
+              <strong id="directive-strategy">通用混合推荐</strong>
+              <small id="directive-expiry">长期生效</small>
+            </div>
+            <fieldset class="response-mode-options" id="response-mode-options">
+              <legend>AI DJ 回复风格</legend>
+              <label>
+                <input type="radio" name="response-mode" id="response-mode-direct" value="direct" checked>
+                <span><strong>直接播放</strong><small>保持原有问答与自动播放。</small></span>
+              </label>
+              <label>
+                <input type="radio" name="response-mode" id="response-mode-playlist" value="playlist">
+                <span><strong>歌单卡片</strong><small>在对话中展示可播放的临时歌单。</small></span>
+              </label>
+              <label>
+                <input type="radio" name="response-mode" id="response-mode-interactive" value="interactive">
+                <span><strong>互动选择</strong><small>意图模糊时先给出几个方向供你选择。</small></span>
+              </label>
+            </fieldset>
+            <label class="directive-toggle">
+              <span>启用临时 AI 指令</span>
+              <input id="directive-enabled" type="checkbox">
+            </label>
+            <label>
+              <span>当前推荐指令</span>
+              <textarea
+                id="directive-instruction"
+                rows="3"
+                maxlength="500"
+                placeholder="例如：接下来两小时多播放不同环境的白噪音"
+              ></textarea>
+            </label>
+            <label class="directive-duration">
+              <span>持续时间（分钟）</span>
+              <input id="directive-duration" type="number" min="15" max="1440" step="15" value="120">
+            </label>
+            <div class="recommendation-divider"></div>
+            <label>
+              <span>听过歌曲重复率 <output id="familiar-rate-output">17%</output></span>
+              <input
+                id="familiar-rate"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value="17"
+              >
+            </label>
+            <div class="recommendation-meter" aria-hidden="true">
+              <span id="familiar-meter"></span>
+            </div>
+            <div class="recommendation-counts" aria-live="polite">
+              <span><b id="familiar-track-count">1</b> 熟悉歌曲</span>
+              <span><b id="discovery-track-count">5</b> 新歌</span>
+            </div>
+          </div>
+          <footer class="section-footer">
+            <p class="section-status" id="recommendation-status" aria-live="polite">已同步</p>
+            <button class="button primary" type="button" data-save-section="recommendation">
+              <i data-lucide="save"></i>保存并同步
+            </button>
+          </footer>
+        </section>
+
+        <section
+          class="integrations-section"
+          id="panel-integrations"
+          role="tabpanel"
+          data-settings-panel="integrations"
+          hidden
+        >
+          <header class="section-heading">
+            <span>04</span>
+            <div><p>SERVICE CONNECTIONS</p><h2>模型与语音服务</h2></div>
+          </header>
+
+          <div class="integration-grid">
+            <fieldset>
+              <legend>LLM ENGINE</legend>
+              <label>
+                <span>服务商</span>
+                <select id="ai-provider"></select>
+              </label>
+              <label id="ai-base-url-field">
+                <span>API Base URL</span>
+                <input id="ai-base-url" type="url" autocomplete="off">
+              </label>
+              <label>
+                <span>模型 ID</span>
+                <input id="ai-model" autocomplete="off">
+              </label>
+              <label id="ai-api-key-field">
+                <span>API Key</span>
+                <div class="secret-field">
+                  <input id="ai-api-key" type="password" autocomplete="new-password">
+                  <button id="clear-ai-key" type="button" title="清除 LAB 大模型 Key" aria-label="清除 LAB 大模型 Key">
+                    <i data-lucide="trash-2"></i>
+                  </button>
+                </div>
+              </label>
+              <p class="credential-status" id="ai-key-status">NOT CONFIGURED</p>
+              <div class="codex-auth" id="codex-auth-actions" hidden>
+                <div class="button-row">
+                  <button class="button primary" id="codex-login-button" type="button">
+                    <i data-lucide="log-in"></i>登录 Codex
+                  </button>
+                  <button class="button" id="codex-refresh-button" type="button">
+                    <i data-lucide="refresh-cw"></i>重新检测
+                  </button>
+                </div>
+                <p id="codex-status-detail">正在检测 Codex CLI</p>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>VOICE ENGINE</legend>
+              <label>
+                <span>服务商</span>
+                <select id="voice-provider"></select>
+              </label>
+              <label>
+                <span>API Endpoint</span>
+                <input id="voice-endpoint" type="url" autocomplete="off">
+              </label>
+              <label>
+                <span>Voice / Reference ID</span>
+                <input id="voice-service-id" autocomplete="off">
+              </label>
+              <label>
+                <span>API Key</span>
+                <div class="secret-field">
+                  <input id="voice-api-key" type="password" autocomplete="new-password">
+                  <button id="clear-voice-key" type="button" title="清除 LAB 语音 Key" aria-label="清除 LAB 语音 Key">
+                    <i data-lucide="trash-2"></i>
+                  </button>
+                </div>
+              </label>
+              <p class="credential-status" id="voice-key-status">NOT CONFIGURED</p>
+            </fieldset>
+
+            <fieldset class="music-sources">
+              <legend>MUSIC SOURCES</legend>
+              <label class="music-source-select">
+                <span>音源模式</span>
+                <select id="music-source"></select>
+              </label>
+              <div class="music-source-grid">
+                <section>
+                  <h3>网易云音乐</h3>
+                  <div class="music-account">
+                    <span id="music-account-indicator"></span>
+                    <div>
+                      <strong id="music-account-name">未登录</strong>
+                      <small id="music-account-detail">LOCAL SESSION</small>
+                    </div>
+                  </div>
+                  <label>
+                    <span>网易云音质</span>
+                    <select id="music-quality"></select>
+                  </label>
+                  <div class="button-row">
+                    <button class="button primary" id="music-login-button" type="button">
+                      <i data-lucide="qr-code"></i>扫码登录
+                    </button>
+                    <button class="button" id="music-logout-button" type="button" disabled>
+                      <i data-lucide="log-out"></i>退出
+                    </button>
+                  </div>
+                  <div class="music-qr" id="music-qr" hidden>
+                    <img id="music-qr-image" alt="网易云音乐登录二维码">
+                    <p id="music-login-status">等待扫码</p>
+                  </div>
+                </section>
+                <section>
+                  <h3>QQ 音乐</h3>
+                  <div class="music-account" id="qq-music-account">
+                    <span id="qq-music-account-indicator"></span>
+                    <div>
+                      <strong id="qq-music-account-name">未登录</strong>
+                      <small id="qq-music-account-detail">DESKTOP QR / MANUAL COOKIE</small>
+                    </div>
+                  </div>
+                  <label>
+                    <span>QQMusicApi Base URL</span>
+                    <input id="qq-music-base-url" type="url" autocomplete="off" placeholder="http://127.0.0.1:3300">
+                  </label>
+                  <label>
+                    <span>QQ 音质</span>
+                    <select id="qq-music-quality"></select>
+                  </label>
+                  <label>
+                    <span>QQ 音乐 Cookie</span>
+                    <div class="secret-field">
+                      <input id="qq-music-cookie" type="password" autocomplete="new-password">
+                      <button id="clear-qq-music-key" type="button" title="清除 QQ 音乐 Cookie" aria-label="清除 QQ 音乐 Cookie">
+                        <i data-lucide="trash-2"></i>
+                      </button>
+                    </div>
+                  </label>
+                  <p class="credential-status" id="qq-music-key-status">NOT CONFIGURED</p>
+                  <div class="button-row qq-login-actions">
+                    <button class="button primary" id="qq-music-login-button" type="button">
+                      <i data-lucide="qr-code"></i>扫码登录
+                    </button>
+                    <button class="button" id="qq-music-logout-button" type="button" disabled>
+                      <i data-lucide="log-out"></i>退出
+                    </button>
+                  </div>
+                  <p class="music-login-message" id="qq-music-login-status" aria-live="polite"></p>
+                  <p class="music-source-note">QQMusicApi 需在本机或可信服务器独立运行。</p>
+                </section>
+              </div>
+            </fieldset>
+          </div>
+          <footer class="section-footer">
+            <p class="section-status" id="integrations-status" aria-live="polite">已同步</p>
+            <button class="button primary" type="button" data-save-section="integrations">
+              <i data-lucide="save"></i>保存并同步
+            </button>
+          </footer>
+        </section>
+
+        <section
+          class="voice-section"
+          id="panel-voice"
+          role="tabpanel"
+          data-settings-panel="voice"
+          hidden
+        >
+          <header class="section-heading">
+            <span>05</span>
+            <div><p>VOICE CHARACTER</p><h2 id="voice-heading">Forever 的声音</h2></div>
+          </header>
+
+          <div class="voice-grid">
+            <label>
+              <span>官方音色</span>
+              <select id="speaker-select"></select>
+            </label>
+            <label>
+              <span>自定义 Speaker ID</span>
+              <input id="speaker-custom" placeholder="声音复刻 speaker_id">
+            </label>
+            <label>
+              <span>合成模型</span>
+              <select id="voice-model">
+                <option value="seed-tts-2.0-expressive">表现力增强</option>
+                <option value="seed-tts-2.0-standard">标准低延迟</option>
+              </select>
+            </label>
+            <label>
+              <span>资源类型</span>
+              <select id="resource-id">
+                <option value="seed-tts-2.0">语音合成 2.0</option>
+                <option value="seed-icl-2.0">声音复刻 2.0</option>
+              </select>
+            </label>
+            <label>
+              <span>情绪</span>
+              <select id="emotion">
+                <option value="">自动判断</option>
+                <option value="happy">愉快</option>
+                <option value="sad">低落</option>
+                <option value="angry">强烈</option>
+                <option value="fear">紧张</option>
+                <option value="surprised">惊喜</option>
+              </select>
+            </label>
+            <label>
+              <span>情绪强度 <output id="emotion-scale-output">3</output></span>
+              <input id="emotion-scale" type="range" min="1" max="5" value="3">
+            </label>
+            <label>
+              <span>语速 <output id="speech-rate-output">-8</output></span>
+              <input id="speech-rate" type="range" min="-50" max="100" value="-8">
+            </label>
+            <label>
+              <span>音量 <output id="loudness-output">0</output></span>
+              <input id="loudness-rate" type="range" min="-50" max="100" value="0">
+            </label>
+          </div>
+
+          <label class="wide-field">
+            <span>声音导演提示</span>
+            <textarea id="voice-style" rows="3" maxlength="300"></textarea>
+          </label>
+
+          <div class="voice-preview">
+            <label>
+              <span>试听文本</span>
+              <textarea id="preview-text" data-transient rows="3" maxlength="500">晚上好，我是 Forever。把今天慢慢放下，接下来听一首安静的歌。</textarea>
+            </label>
+            <audio id="preview-audio" controls></audio>
+          </div>
+          <footer class="section-footer">
+            <p class="section-status" id="voice-status" aria-live="polite">已同步</p>
+            <div class="button-row">
+              <button class="button" id="preview-button" type="button"><i data-lucide="volume-2"></i>生成试听</button>
+              <button class="button primary" type="button" data-save-section="voice">
+                <i data-lucide="save"></i>保存并同步
+              </button>
+            </div>
+          </footer>
+        </section>
+        <section id="panel-appearance" role="tabpanel" data-settings-panel="appearance" hidden>
+          <header class="section-heading">
+            <span>06</span>
+            <div><p>LISTENING ROOM</p><h2>播放页面</h2></div>
+          </header>
+          <div class="appearance-options">
+            <label class="appearance-option">
+              <input type="radio" name="player-style" value="classic" checked>
+              <span><strong>经典电台</strong><small>时间舞台、播放队列与助手对话。</small></span>
+            </label>
+            <label class="appearance-option">
+              <input type="radio" name="player-style" value="album">
+              <span><strong>唱片沉浸</strong><small>真实专辑封面、立体唱片队列与随封面变化的柔光背景，助手融入页面底部。</small></span>
+            </label>
+            <label class="appearance-option">
+              <input type="radio" name="player-style" value="glass">
+              <span><strong>玻璃桌面</strong><small>左侧大时钟与唱片，右侧磨砂玻璃里的队列和助手，共享专辑封面的柔光背景。</small></span>
+            </label>
+            <p>选择后点击「保存并同步」，已打开的电台会实时切换，音乐继续播放。</p>
+          </div>
+          <footer class="section-footer">
+            <p class="section-status" id="appearance-status" aria-live="polite">已同步</p>
+            <button class="button primary" type="button" data-save-section="appearance">
+              <i data-lucide="save"></i>保存并同步
+            </button>
+          </footer>
+        </section>
+      </form>
+    </main>
+  </div>
+
+  <script src="/help-content.js"></script>
+  <script src="/guide.js"></script>
+  <script src="/debug.js"></script>
+</body>
+</html>
