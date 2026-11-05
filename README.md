@@ -90,3 +90,7 @@ TTS 使用 LAB 中选定的服务：
 - `POST /api/settings/avatar`
 - `POST /api/settings/avatar/reset`
 - `WS /stream`
+
+## 联系我
+
+如有疑问，请通过邮箱 [zhoujiaru2324@163.com](mailto:zhoujiaru2324@163.com) 留言联系我。
